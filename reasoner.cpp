@@ -28,11 +28,15 @@ namespace reasoner {
             result |= tokenstmp & (tokenstmp >> m[i].s1);
             // if (tokenstmp & (tokenstmp >> m[i].s1)) {
             //     size = 0;
+            //     variables[current_player - 1] = 100;
+            //     variables[current_player % 2] = 0;
             //     return;
             // }
         }
         if (result) {
             size = 0;
+            // variables[current_player - 1] = 100;
+            // variables[current_player % 2] = 0;
             return;
         }
 
@@ -40,6 +44,7 @@ namespace reasoner {
         if (move_mask > (1ull << 47)) {
             if (size == 1) {
                 size = 0;
+                // variables[0] = variables[1] = 50;
                 return;
             }
             all_moves[move_id].mr = all_moves.back().mr;
