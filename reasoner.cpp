@@ -23,7 +23,8 @@ namespace reasoner {
         };
 
         for (int i = 0; i < 4; ++i) {
-            if (tokens & (tokens >> m[i].s1) & (tokens >> m[i].s2) & (tokens >> m[i].s3) & m[i].mask) {
+            uint64_t tokenstmp = tokens & (tokens >> m[i].s2);
+            if (tokenstmp & (tokenstmp >> m[i].s1) & m[i].mask) {
                 size = 0;
                 return;
             }
