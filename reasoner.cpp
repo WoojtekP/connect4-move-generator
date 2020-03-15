@@ -16,22 +16,28 @@ namespace reasoner {
         tokens |= move_mask;
 
         static constexpr line_matcher m[] = {
-            {0x78F1E3C78Full, 1, 2, 3},  // row
-            {0x1FFFFFull, 7, 14, 21},  // column
-            {0x1E3C78ull, 6, 12, 18},  // left diagonal
-            {0x3C78Full, 8, 16, 24}  // righ diagonal
+            {1, 2},  // row
+            {8, 16},  // column
+            {7, 14},  // left diagonal
+            {9, 18}  // righ diagonal
         };
 
+        uint64_t result = 0;
         for (int i = 0; i < 4; ++i) {
             uint64_t tokenstmp = tokens & (tokens >> m[i].s2);
-            if (tokenstmp & (tokenstmp >> m[i].s1) & m[i].mask) {
-                size = 0;
-                return;
-            }
+            result |= tokenstmp & (tokenstmp >> m[i].s1);
+            // if (tokenstmp & (tokenstmp >> m[i].s1)) {
+            //     size = 0;
+            //     return;
+            // }
+        }
+        if (result) {
+            size = 0;
+            return;
         }
 
-        move_mask <<= 7;
-        if (move_mask >= (1ull << 42)) {
+        move_mask <<= 8;
+        if (move_mask > (1ull << 47)) {
             if (size == 1) {
                 size = 0;
                 return;

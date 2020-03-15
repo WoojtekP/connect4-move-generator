@@ -29,10 +29,8 @@ namespace reasoner {
         YELLOW = 2
     };
     struct line_matcher {
-        uint64_t mask;
         uint8_t s1;
         uint8_t s2;
-        uint8_t s3;
     };
     class game_state {
         public:

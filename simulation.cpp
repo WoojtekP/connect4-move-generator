@@ -115,7 +115,7 @@ void random_simulation(){
     while(true) {
         uint m = state.get_moves_count();
         if (!m) {
-            count_terminal(state, depth);
+            // count_terminal(state, depth);
             return;
         }
         depth++;
