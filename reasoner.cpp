@@ -37,7 +37,7 @@ namespace reasoner {
 
     void game_state::get_all_moves(resettable_bitarray_stack&, std::vector<move>& moves) {
         moves.clear();
-        for (uint i = 0; i < 7; ++i) {
+        for (uint8_t i = 0; i < 7; ++i) {
             if (column_shift[i] <= 46) {
                 moves.push_back(i);
             }

@@ -1,9 +1,7 @@
 #ifndef REASONER
 #define REASONER
 
-#include <cassert>
 #include <cstdint>
-#include <string>
 #include <vector>
 
 namespace reasoner {
@@ -14,7 +12,7 @@ namespace reasoner {
 
     class resettable_bitarray_stack {};
 
-    typedef uint move_representation;
+    typedef uint8_t move_representation;
     struct move {
         move_representation mr;
         move(const move_representation& mv) : mr(mv) {};
