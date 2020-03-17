@@ -9,13 +9,12 @@ namespace reasoner {
         return variables[player_id-1];
     }
 
-    void game_state::apply_move(const uint& move_id) {
-        auto move_mask = all_moves[move_id].mr;
-        uint64_t tokens = (current_player == YELLOW) ? yellow : red;
+    void game_state::apply_move(const move& m) {
+        uint64_t &tokens = pieces[current_player-1];
+        tokens |= 1ull << column_shift[m.mr];
+        column_shift[m.mr] += 8;
 
-        tokens |= move_mask;
-
-        static constexpr line_matcher m[] = {
+        static constexpr line_matcher shift[] = {
             {1, 2},  // row
             {8, 16},  // column
             {7, 14},  // left diagonal
@@ -24,55 +23,25 @@ namespace reasoner {
 
         uint64_t result = 0;
         for (int i = 0; i < 4; ++i) {
-            uint64_t tokenstmp = tokens & (tokens >> m[i].s2);
-            result |= tokenstmp & (tokenstmp >> m[i].s1);
-            // if (tokenstmp & (tokenstmp >> m[i].s1)) {
-            //     size = 0;
-            //     variables[current_player - 1] = 100;
-            //     variables[current_player % 2] = 0;
-            //     return;
-            // }
+            uint64_t tokenstmp = tokens & (tokens >> shift[i].s2);
+            result |= tokenstmp & (tokenstmp >> shift[i].s1);
         }
         if (result) {
-            size = 0;
-            // variables[current_player - 1] = 100;
-            // variables[current_player % 2] = 0;
+            variables[current_player - 1] = 100;
+            variables[current_player % 2] = 0;
+            current_player = 0;
             return;
         }
+        current_player ^= 0b11;
+    }
 
-        move_mask <<= 8;
-        if (move_mask > (1ull << 47)) {
-            if (size == 1) {
-                size = 0;
-                // variables[0] = variables[1] = 50;
-                return;
+    void game_state::get_all_moves(resettable_bitarray_stack&, std::vector<move>& moves) {
+        moves.clear();
+        for (uint i = 0; i < 7; ++i) {
+            if (column_shift[i] <= 46) {
+                moves.push_back(i);
             }
-            all_moves[move_id].mr = all_moves.back().mr;
-            size--;
         }
-        else {
-            all_moves[move_id].mr = move_mask;
-        }
-
-        if (current_player == RED) {
-            red = tokens;
-            current_player = YELLOW;
-        }
-        else {
-            yellow = tokens;
-            current_player = RED;
-        }
-    }
-
-    std::vector<move> game_state::get_all_moves(resettable_bitarray_stack& cache) {
-        std::vector<move> result;
-        result.reserve(100);
-        get_all_moves(cache, result);
-        return result;
-    }
-
-    void game_state::get_all_moves(resettable_bitarray_stack&, std::vector<move>&) {
-        return;
     }
 
     bool game_state::apply_any_move(resettable_bitarray_stack&) {
@@ -80,15 +49,11 @@ namespace reasoner {
     }
 
     int game_state::get_monotonicity_class(void) {
-        return -1;
+        return 0;
     }
 
     bool game_state::is_legal([[maybe_unused]] const move& m) const {
-        return false;
-    }
-
-    uint game_state::get_moves_count() const {
-        return size;
+        return column_shift[m.mr] <= 46;
     }
 
 }
