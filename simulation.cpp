@@ -110,47 +110,31 @@ void random_simulation_with_monotonic_moves(){
 }
 
 void random_simulation(){
+    static std::vector<reasoner::move> legal_moves;
     reasoner::game_state state = initial_state;
     uint depth = 0;
-    while(true) {
-        uint m = state.get_moves_count();
-        if (!m) {
-            // count_terminal(state, depth);
+    while(true){
+        state.get_all_moves(cache, legal_moves);
+        if(legal_moves.empty()){
+            count_terminal(state, depth);
             return;
         }
-        depth++;
-        std::uniform_int_distribution<uint> distribution(0,m-1);
-        uint chosen_move = distribution(random_generator);
-        state.apply_move(chosen_move);
+        else{
+            depth++;
+            moves_count += legal_moves.size();
+            std::uniform_int_distribution<uint> distribution(0,legal_moves.size()-1);
+            uint chosen_move = distribution(random_generator);
+            state.apply_move(legal_moves[chosen_move]);
+        }
+        while(state.get_current_player() == KEEPER){
+            auto any_move = state.apply_any_move(cache);
+            if(not any_move){
+                count_terminal(state, depth);
+                return;
+            }
+        }
     }
 }
-
-// void random_simulation(){
-//     static std::vector<reasoner::move> legal_moves;
-//     reasoner::game_state state = initial_state;
-//     uint depth = 0;
-//     while(true){
-//         state.get_all_moves(cache, legal_moves);
-//         if(legal_moves.empty()){
-//             count_terminal(state, depth);
-//             return;
-//         }
-//         else{
-//             depth++;
-//             moves_count += legal_moves.size();
-//             std::uniform_int_distribution<uint> distribution(0,legal_moves.size()-1);
-//             uint chosen_move = distribution(random_generator);
-//             state.apply_move(legal_moves[chosen_move]);
-//         }
-//         while(state.get_current_player() == KEEPER){
-//             auto any_move = state.apply_any_move(cache);
-//             if(not any_move){
-//                 count_terminal(state, depth);
-//                 return;
-//             }
-//         }
-//     }
-// }
 
 double count_per_sec(ulong count, ulong ms){
     return static_cast<long double>(count)/ms*1000.0;

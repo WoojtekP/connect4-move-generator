@@ -10,7 +10,7 @@
 
 namespace reasoner {
     constexpr int NUMBER_OF_PLAYERS = 3;
-    constexpr int MONOTONIC_CLASSES = 0;
+    constexpr int MONOTONIC_CLASSES = 1;
 
     class resettable_bitarray_stack {};
 
